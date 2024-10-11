@@ -35,10 +35,20 @@ export const WhiteboardProvider = ({ children }) => {
     return docRef.id;
   };
 
-  const updateWhiteboardElement = async (whiteboardId, elementId, data) => {
+  const addElement = async (whiteboardId, element) => {
+    const updatedElements = [...currentWhiteboard.elements, element];
+    await updateDocument('whiteboards', whiteboardId, { elements: updatedElements });
+  };
+
+  const updateElement = async (whiteboardId, elementId, data) => {
     const updatedElements = currentWhiteboard.elements.map((el) =>
       el.id === elementId ? { ...el, ...data } : el
     );
+    await updateDocument('whiteboards', whiteboardId, { elements: updatedElements });
+  };
+
+  const deleteElement = async (whiteboardId, elementId) => {
+    const updatedElements = currentWhiteboard.elements.filter((el) => el.id !== elementId);
     await updateDocument('whiteboards', whiteboardId, { elements: updatedElements });
   };
 
@@ -55,7 +65,9 @@ export const WhiteboardProvider = ({ children }) => {
         currentWhiteboard,
         setCurrentWhiteboard,
         createWhiteboard,
-        updateWhiteboardElement,
+        addElement,
+        updateElement,
+        deleteElement,
         saveWhiteboardImage,
       }}
     >

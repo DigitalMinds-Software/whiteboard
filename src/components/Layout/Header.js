@@ -16,7 +16,7 @@ const Header = ({ onSidebarToggle }) => {
 
   return (
     <AppBar position="static">
-      <Toolbar>
+      <Toolbar variant='dense'>
         <IconButton
           edge="start"
           color="inherit"
@@ -27,7 +27,7 @@ const Header = ({ onSidebarToggle }) => {
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Whiteboard App
+          Whiteboard
         </Typography>
         {user ? (
           <Button color="inherit" onClick={handleLogout}>

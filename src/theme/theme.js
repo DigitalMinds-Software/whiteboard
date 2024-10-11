@@ -8,6 +8,7 @@ const theme = createTheme({
     secondary: {
       main: '#f50057',
     },
+    mode: 'dark'
   },
   typography: {
     fontFamily: 'Roboto, Arial, sans-serif',

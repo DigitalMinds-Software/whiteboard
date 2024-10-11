@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Text, Transformer } from 'react-konva';
 
-const TextAnnotation = ({ isSelected, onSelect, onChange, ...textProps }) => {
+const TextAnnotation = ({ element, isSelected, onSelect, onChange }) => {
   const [editing, setEditing] = useState(false);
   const textRef = useRef();
   const transformerRef = useRef();
@@ -18,8 +18,7 @@ const TextAnnotation = ({ isSelected, onSelect, onChange, ...textProps }) => {
   };
 
   const handleTextChange = (e) => {
-    onChange({
-      ...textProps,
+    onChange(element.id, {
       text: e.target.value,
     });
   };
@@ -33,26 +32,32 @@ const TextAnnotation = ({ isSelected, onSelect, onChange, ...textProps }) => {
     <>
       <Text
         ref={textRef}
-        {...textProps}
+        {...element}
         onDblClick={handleTextDblClick}
-        onClick={() => onSelect(textProps.id)}
-        onTap={() => onSelect(textProps.id)}
+        onClick={() => onSelect(element.id)}
+        onTap={() => onSelect(element.id)}
         draggable
+        onDragEnd={(e) => {
+          onChange(element.id, {
+            x: e.target.x(),
+            y: e.target.y(),
+          });
+        }}
       />
       {editing && (
         <textarea
-          value={textProps.text}
+          value={element.text}
           onChange={handleTextChange}
           onBlur={handleBlur}
           style={{
             position: 'absolute',
-            top: textProps.y + 'px',
-            left: textProps.x + 'px',
+            top: element.y + 'px',
+            left: element.x + 'px',
             width: '200px',
             height: '100px',
-            fontSize: textProps.fontSize + 'px',
-            fontFamily: textProps.fontFamily,
-            color: textProps.fill,
+            fontSize: element.fontSize + 'px',
+            fontFamily: element.fontFamily,
+            color: element.fill,
             border: 'none',
             padding: '0px',
             margin: '0px',

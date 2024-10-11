@@ -1,9 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useContext } from 'react';
 import { Line } from 'react-konva';
+import { WhiteboardContext } from '../../context/WhiteboardContext';
 
-const ShapeRecognition = ({ onShapeRecognized }) => {
+const ShapeRecognition = ({ whiteboardId }) => {
   const [points, setPoints] = useState([]);
   const isDrawing = useRef(false);
+  const { addElement } = useContext(WhiteboardContext);
 
   const handleMouseDown = (e) => {
     isDrawing.current = true;
@@ -23,7 +25,7 @@ const ShapeRecognition = ({ onShapeRecognized }) => {
     isDrawing.current = false;
     const recognizedShape = recognizeShape(points);
     if (recognizedShape) {
-      onShapeRecognized(recognizedShape);
+      addElement(whiteboardId, recognizedShape);
     }
     setPoints([]);
   };
@@ -55,9 +57,8 @@ const ShapeRecognition = ({ onShapeRecognized }) => {
     // Check if the shape is closed
     const distanceToStart = Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2);
     const isClosed = distanceToStart < totalLength * 0.1;
-    
+
     if (isClosed) {
-      // Circle detection
       const estimatedRadius = (width + height) / 4;
       const estimatedCircumference = 2 * Math.PI * estimatedRadius;
       if (Math.abs(totalLength - estimatedCircumference) < estimatedCircumference * 0.2) {
@@ -66,21 +67,14 @@ const ShapeRecognition = ({ onShapeRecognized }) => {
           center: { x: (minX + maxX) / 2, y: (minY + maxY) / 2 },
           radius: estimatedRadius
         };
-      }
-      
-      // Rectangle detection
-      if (aspectRatio > 0.7 && aspectRatio < 1.3) {
+      } else if (aspectRatio > 0.7 && aspectRatio < 1.3) {
         return {
           type: 'rectangle',
           topLeft: { x: minX, y: minY },
           width,
           height
         };
-      }
-      
-      // Triangle detection
-      const isTriangle = points.length <= 8; // Simplified check for triangle
-      if (isTriangle) {
+      } else if (points.length <= 8) {
         return {
           type: 'triangle',
           points: [
@@ -92,7 +86,10 @@ const ShapeRecognition = ({ onShapeRecognized }) => {
       }
     }
     
-    return null; // Shape not recognized
+    return {
+      type: 'freehand',
+      points: points
+    };
   };
 
   return (
